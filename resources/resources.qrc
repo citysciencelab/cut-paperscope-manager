@@ -1,0 +1,8 @@
+<RCC>
+	<qresource prefix="/">
+		<file>css/stylesheet.qss</file>
+		<file>svg/header-logo.svg</file>
+		<file>svg/icons/qcombobox-arrow.svg</file>
+		<file>svg/icons/separator.svg</file>
+	</qresource>
+</RCC>

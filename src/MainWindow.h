@@ -1,0 +1,70 @@
+/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	INCLUDES
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+
+	#pragma once
+
+	// Qt
+	#include <QMainWindow>
+	#include <QHBoxLayout>
+	#include <QCloseEvent>
+	#include <QJsonObject>
+	
+	// App
+	#include "ui/menu/MainMenu.h"
+	#include "ui/navi/MainNavi.h"
+	#include "ui/renderer/Renderer.h"
+	#include "paperscope/PaperScope.h"
+	#include "paperscope/describe/PSObject.h"
+
+
+
+/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	CLASS DECLARATION
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+
+class MainWindow : public QMainWindow {
+	
+	Q_OBJECT
+
+	public:
+		
+		MainWindow(QWidget *parent = nullptr);
+		~MainWindow();
+
+		// paperscope
+		void initPaperScope();
+		PaperScope *paperScope;
+
+
+	private:
+
+		// ui
+		void initUserInterface();
+		QWidget *centralWidget;
+		QHBoxLayout *centralLayout;
+		MainMenu *mainMenu;
+		MainNavi *mainNavi;
+		Renderer *renderer;
+
+		// camera
+		void initCamera();
+		void onPermissionUpdated(const QPermission &permission);
+		void onCameraAccess();
+		void onCameraDenied();
+
+		// window
+		void closeEvent(QCloseEvent *event);
+
+	
+	signals: 
+		
+		// camera
+		void cameraDevicesUpdated(QList<QCameraDevice> cameras);
+};

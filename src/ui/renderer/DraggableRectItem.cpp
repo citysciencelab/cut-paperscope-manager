@@ -1,0 +1,78 @@
+/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	INCLUDES
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+
+	#include "DraggableRectItem.h"
+
+	// Qt
+	#include <QCursor>
+	#include <QGraphicsView>
+	#include <QGraphicsScene>
+
+
+
+
+/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	CONSTRUCTOR
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+
+    DraggableRectItem::DraggableRectItem(QGraphicsItem* parent)
+        : QGraphicsRectItem(0, 0, 10, 10, parent),
+        isDragging(false)
+	{
+
+		setBrush(QBrush(QColor::fromRgb(255,0,0)));
+		setPen(Qt::NoPen);
+       
+	    setFlag(QGraphicsItem::ItemIsMovable);
+        setFlag(QGraphicsItem::ItemIsSelectable);
+        setCursor(Qt::OpenHandCursor);
+		setVisible(false);
+    }
+
+
+
+/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	MOUSE EVENTS
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+
+    void DraggableRectItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+        
+		if (event->button() == Qt::LeftButton) {
+            isDragging = true;
+            dragStartPos = event->pos();
+            setCursor(Qt::ClosedHandCursor);
+        }
+        QGraphicsRectItem::mousePressEvent(event);
+    }
+
+
+    void DraggableRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+        
+		if (isDragging) {
+            QPointF offset = event->pos() - dragStartPos;
+            setPos(pos() + offset);
+        }
+        
+		QGraphicsRectItem::mouseMoveEvent(event);
+    }
+
+
+    void DraggableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+        
+		if (event->button() == Qt::LeftButton) {
+            isDragging = false;
+            setCursor(Qt::OpenHandCursor);
+        }
+       
+	    QGraphicsRectItem::mouseReleaseEvent(event);
+    }

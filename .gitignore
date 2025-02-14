@@ -1,0 +1,12 @@
+# OS
+**/.DS_Store
+.rnd
+PaperScopeManager.pro.user
+
+# Code
+build/*
+
+# Editor
+/.fleet
+/.idea
+/.vscode
