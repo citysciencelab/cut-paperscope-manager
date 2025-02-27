@@ -5,7 +5,6 @@
 This guide will help you set up the PaperScope Manager on both Windows and Mac. 
 
 
----
 
 
 ## Prerequisites
@@ -16,7 +15,6 @@ This guide will help you set up the PaperScope Manager on both Windows and Mac.
 - [Homebrew](https://brew.sh) (Mac)
 
 
----
 
 
 ## Setup
@@ -79,9 +77,84 @@ Build the project by clicking on the "Build" button or selecting `Build > Build 
 Run the application by clicking on the "Run" button or selecting `Build > Run` from the menu.
 
 
----
 
 
 ## How To Use
 
-tbd
+### Setup
+1. If you want to sync tracked data with a visualizer instance, you need to enter a valid project ID.
+2. Select your preferred webcam and resolution/framerate settings. You can switch between different cameras by clicking the "Open camera" button..
+3. Select a tracking mode.
+
+
+![PaperScope Manager 01](assets/paperscope-manager-01.png)
+
+
+### Calibration
+
+There are two calibration modes available:
+
+**Calibration Matrix**:
+This mode uses an [OpenCV checkerboard pattern](https://github.com/kyle-bersani/opencv-examples/blob/master/CalibrationByChessboard/chessboard-to-print.pdf) to remove your webcam lens distortion.
+
+**Manual Calibration**:
+This mode allows you to manually set the desired tracking area in the webcam view.
+
+1. Use the selectbox "Active Calibration Mode" to switch between modes.
+2. To set your calibration click the button "Calibrate".
+
+![PaperScope Manager 02](assets/paperscope-manager-02.png)
+
+
+### PaperScope Config
+
+The PaperScope Tracking Pipeline is separated into 5 stages.
+
+#### 2D Plane
+
+First, the webcam view is transformed into a 2d plane.
+
+![PaperScope Config 01](assets/paperscope-config-01.jpg)
+
+
+#### Processing
+
+Use the four slider in the "Processing" view to optimize the webcam image input. 
+
+**Threshold Dark:** darken background pixels
+
+**Threshold Light**: Increase contrast of drawn shapes for better shape detection. 
+
+**Threshold Red** Modify red color range (hue channel) to optimize street detection.
+
+**Smoothing**: When using the "Calibration Matrix" mode you can smooth out perspective tracking errors and reduce jitter.
+
+![PaperScope Config 02](assets/paperscope-config-02.jpg)
+
+
+#### Threshold
+
+The "Tresholding" view should display all desired shapes without streets (red color).
+
+![PaperScope Config 03](assets/paperscope-config-03.png)
+
+
+#### Streets
+
+The "Streets" view should display all streets as thin red lines.
+
+![PaperScope Config 04](assets/paperscope-config-04.png)
+
+
+#### Bounding Boxes
+
+The "Bounding Boxes" view shows all classified shapes from our ai model.
+
+![PaperScope Config 05](assets/paperscope-config-05.png)
+
+
+#### Contours
+
+The "Contours" view shows the final shapes that will be sent to the visualizer.
+
+![PaperScope Config 06](assets/paperscope-config-06.png)

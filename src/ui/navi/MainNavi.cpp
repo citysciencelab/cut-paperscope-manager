@@ -120,7 +120,7 @@
 	void MainNavi::initProject() {
 
 		// label
-		labelProject = new QLabel("Project",this);
+		labelProject = new QLabel("Project ID",this);
 		labelProject->setObjectName("title");
 		layout->addWidget(labelProject);
 

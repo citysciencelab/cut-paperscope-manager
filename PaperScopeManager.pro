@@ -7,7 +7,7 @@ TARGET = "PaperScope Manager"
 
 QT += core core5compat gui widgets multimedia svgwidgets network websockets
 
-CONFIG += c++17#
+CONFIG += c++17
 
 
 #########################################
@@ -73,8 +73,14 @@ INCLUDEPATH += \
 
 macx {
     ICON = resources/icon/PaperScopeIcon.icns
+
+    # add support for pkg-config
+    QT_CONFIG -= no-pkg-config
     CONFIG += link_pkgconfig
+    PKG_CONFIG = /opt/homebrew/bin/pkg-config
+
     PKGCONFIG += opencv4
+
     QMAKE_INFO_PLIST = resources/os/mac/Info.plist
     LIBS += -L$$PWD/thirdparty/tensorflow-lite/lib/mac -ltensorflowlite
     DEPENDPATH += $$PWD/thirdparty/tensorflow-lite/lib/mac
@@ -83,6 +89,7 @@ macx {
     BundleFiles.path = Contents/MacOS
     BundleFiles.files += \
         $$PWD/thirdparty/tensorflow-lite/lib/mac/libtensorflowlite.dylib \
+        #$$PWD/thirdparty/tensorflow-lite/lib/mac/libtensorflowlite_intel.dylib \
         $$PWD/resources/keras/shape-classifier_v4.tflite
     QMAKE_BUNDLE_DATA += BundleFiles
 }

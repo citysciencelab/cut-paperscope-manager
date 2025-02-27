@@ -70,8 +70,6 @@
 		layout->setColumnMinimumWidth(1, 15);
 		layout->setRowMinimumHeight(1, 25);
 		setLayout(layout);
-
-		
 	}
 
 
@@ -125,7 +123,7 @@
 		layout->addWidget(inputPaperscopeScaling, 3, 0);
 	}
 
-
+ 
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -139,9 +137,11 @@
 		// validate input
 		QString serverUrl = inputServerUrl->text();
 		if(!serverUrl.endsWith("/")) { serverUrl.append("/"); }
+        QString scaling = inputPaperscopeScaling->text().replace(",", ".");
+        inputPaperscopeScaling->setText(scaling);
 
 		// save settings
         Settings::instance()->saveString("server_url", serverUrl);
         Settings::instance()->saveString("websocket_port", inputWebsocketPort->text());
-		Settings::instance()->saveFloat("scaling", inputPaperscopeScaling->text().toFloat());
+		Settings::instance()->saveFloat("scaling", scaling.toFloat());
 	}

@@ -357,7 +357,7 @@
 
 		// minimum size of contour
 		if(contour.size() < 3) { return false; }
-		if(cv::contourArea(contour) < 300) { return false; }
+		if(cv::contourArea(contour) < 150) { return false; }
 
 		// maximum size of contour
 		if(cv::contourArea(contour) > 300*300) { return false; }
@@ -431,8 +431,10 @@
 
 	void PSDetect::createCandidate(std::vector<cv::Point> contour) {
 
-		// classify shape
 		cv::Rect rect = cv::boundingRect(contour);
+		if(rect.width < 1|| rect.height < 1) { return; }
+
+		// classify shape
 		cv::Mat roi = (*matThreshold)(rect);
 		PSShapeType shapeType = classifyShape(roi);
 

@@ -176,6 +176,7 @@
 	void MainWindow::onCameraAccess() {
 
 		QList<QCameraDevice> cameras = QMediaDevices::videoInputs();
+		if(cameras.isEmpty()) { return onCameraDenied(); }
 		emit cameraDevicesUpdated(cameras);
 	}
 

@@ -26,8 +26,11 @@
 		  matTracking(matTracking),
           matRender(matRender)
 	{
-		
-		// set random uid as string
+
+        // init properties
+        colorIndex = 0;
+
+        // set random uid as string
 		uid = QString::number(QRandomGenerator::global()->bounded(100000,999999)).toStdString();
 
 		// normalize points
@@ -120,11 +123,12 @@
 
 	void PSObject::detectColor() {
 
-		if(shapeType == PSShapeType::Street) { return; }
+        if(shapeType == PSShapeType::Street) { return; }
 
 		// get roi of object from matTracking
 		cv::Rect rect = cv::boundingRect(candidatePoints);
-		if(rect.width < 1 || rect.height < 1) { return; }
+        if(rect.width < 1 || rect.height < 1 || rect.x < 0 || rect.y < 0) { return; }
+        if(rect.x + rect.width > matTracking->cols || rect.y + rect.height > matTracking->rows) { return; }
 		cv::Mat roi = (*matTracking)(rect);
 
 		// every pixel outside of candidatePoints shape should be black
@@ -208,7 +212,7 @@
 		if(shapeType == PSShapeType::Street) { return; }
 
 		cv::Rect rect = cv::boundingRect(candidatePoints);
-		if(rect.width == 0 || rect.height == 0) { return; }
+        if(rect.width < 1 || rect.height < 1) { return; }
 
 		// render color as circle
 		cv::Mat rgbColor;

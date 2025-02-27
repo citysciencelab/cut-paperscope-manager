@@ -80,7 +80,7 @@
 		updateStreets();
 
 		drawScene(candidates);
-		drawStreets();
+		//drawStreets();
 	}
 
 
@@ -233,17 +233,18 @@
 			if(objects[i].confidence < 20) { continue; }
 			countObjects++;
 
-			objects[i].detectColor();
-			objects[i].drawContour();
+            objects[i].detectColor();
+            objects[i].drawContour();
 
 			// draw confidence above object
-			cv::Rect boundingRect = cv::boundingRect(objects[i].candidatePoints);
-			cv::putText(*matRender, std::to_string(objects[i].confidence), cv::Point(boundingRect.x, boundingRect.y - 8), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
+            cv::Rect boundingRect = cv::boundingRect(objects[i].candidatePoints);
+            if(boundingRect.width < 1 || boundingRect.height < 1) { continue; }
+            cv::putText(*matRender, std::to_string(objects[i].confidence), cv::Point(boundingRect.x, boundingRect.y - 8), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
 		}
 
 		// show candidate and object count in matRender
-		cv::putText(*matRender, "Candidates: " + std::to_string(candidates.size()), cv::Point(30, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
-		cv::putText(*matRender, "Objects: " + std::to_string(countObjects), cv::Point(30, 110), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
+        cv::putText(*matRender, "Candidates: " + std::to_string(candidates.size()), cv::Point(30, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
+        cv::putText(*matRender, "Objects: " + std::to_string(countObjects), cv::Point(30, 110), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
 	}
 
 
@@ -251,8 +252,8 @@
 
 		if(renderMode != RenderMode::PaperScope || viewMode != PSViewMode::Contours) { return; }
 
-		//cv::cvtColor(*matStreets, *matStreets, cv::COLOR_GRAY2BGR);
-		//cv::multiply(*matStreets, 0.25, *matStreets);
+		// cv::cvtColor(*matStreets, *matStreets, cv::COLOR_GRAY2BGR);
+		// cv::multiply(*matStreets, 0.25, *matStreets);
 
 		// draw contours
 		// for(int i = 0; i < (int) validContours.size(); i++) {
