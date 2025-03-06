@@ -10,6 +10,7 @@ This guide will help you set up the PaperScope Manager on both Windows and Mac.
 ## Prerequisites
 
 - Git
+- [Visual Studio 2022](https://visualstudio.microsoft.com/de/downloads/)
 - [Qt Framework](https://www.qt.io/download-open-source)
 - [CMake](https://cmake.org) (Windows)
 - [Homebrew](https://brew.sh) (Mac)
