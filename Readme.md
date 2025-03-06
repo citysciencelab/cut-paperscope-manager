@@ -48,6 +48,10 @@ Build OpenCV:
 ```
 cmake --build . --config Release
 ```
+or alternatively  
+```
+cmake --build . --config Debug
+```
 
 If compiling OpenCV doesn't work, you can use the precompiled files available in the `thirdparty/opencv` directory. For a detailed setup guide visit https://jinscott.medium.com/build-opecv-on-windows-with-cuda-f880270eadb0
 
