@@ -37,7 +37,7 @@ Create a build directory and navigate to it:
 mkdir build && cd build
 ```
 
-Configure the build with CMake:
+Configure the build with CMake and if necessary replace path to OpenCV extra modules ('opencv_contrib'):
 ```
 cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules ..
 ```
