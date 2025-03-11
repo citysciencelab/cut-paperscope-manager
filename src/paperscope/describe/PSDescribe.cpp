@@ -230,7 +230,7 @@
 		int countObjects = 0;
 		for(int i = 0; i < (int) objects.size(); i++) {
 			
-			if(objects[i].confidence < 20) { continue; }
+			if(objects[i].confidence <= 20) { continue; }
 			countObjects++;
 
             objects[i].detectColor();

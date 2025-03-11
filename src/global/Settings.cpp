@@ -201,7 +201,7 @@
 
 		// prepare list
 		QList<QVariant> list;
-		for(int i = 0; i < value.size(); i++) { list.append(QPointF(value[i].x, value[i].y)); }
+		for(int i = 0; i < (int) value.size(); i++) { list.append(QPointF(value[i].x, value[i].y)); }
 
 		// save key
 		unsavedSettings[key] = list;

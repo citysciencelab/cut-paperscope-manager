@@ -22,8 +22,8 @@
 	MainMenu::MainMenu(QWidget *parent)
 		: QMenuBar(parent),
 		  settingsMenu(nullptr),
-		  loadAction(nullptr),
-		  saveAction(nullptr)
+		  saveAction(nullptr),
+		  loadAction(nullptr)
 	{
 
 		// init member

@@ -36,7 +36,9 @@ class PSObject {
 
 		// tracking
 		bool isSame(std::vector<cv::Point> targetPoints, PSShapeType targetShape);
-		int confidence;
+		void normalizeCandidates();
+        void lerp(std::vector<cv::Point> targetPoints);
+        int confidence;
 
 		// contour
 		PSShapeType shapeType;

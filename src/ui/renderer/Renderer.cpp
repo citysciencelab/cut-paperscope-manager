@@ -194,7 +194,7 @@
 			if(!isCalibrating && points.size() == 4) {
 				
 				// scale points
-				for(int i=0; i<points.size(); i++) {
+                for(int i=0; i < (int) points.size(); i++) {
 					points[i].x *= scaling;
 					points[i].y *= scaling;
 				}
@@ -300,7 +300,7 @@
 		points.push_back(cv::Point2f( (cornerPointBL->pos().x() + 15.0), (cornerPointBL->pos().y() - 5.0) ));
 
 		// scale points
-		for(int i=0; i<points.size(); i++) {
+        for(int i=0; i < (int) points.size(); i++) {
 			points[i].x /= scaling;
 			points[i].y /= scaling;
 		}

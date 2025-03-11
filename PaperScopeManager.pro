@@ -64,7 +64,6 @@ HEADERS += \
 
 INCLUDEPATH += \
     thirdparty/tensorflow-lite/include \
-    thirdparty/opencv/include
 
 
 #########################################
@@ -72,6 +71,10 @@ INCLUDEPATH += \
 #########################################
 
 macx {
+    
+    INCLUDEPATH += \
+        thirdparty/opencv/include/mac
+
     ICON = resources/icon/PaperScopeIcon.icns
 
     # add support for pkg-config
@@ -81,7 +84,6 @@ macx {
 
     PKGCONFIG += opencv4
 
-    QMAKE_INFO_PLIST = resources/os/mac/Info.plist
     LIBS += -L$$PWD/thirdparty/tensorflow-lite/lib/mac -ltensorflowlite
     DEPENDPATH += $$PWD/thirdparty/tensorflow-lite/lib/mac
     
@@ -92,6 +94,7 @@ macx {
         #$$PWD/thirdparty/tensorflow-lite/lib/mac/libtensorflowlite_intel.dylib \
         $$PWD/resources/keras/shape-classifier_v4.tflite
     QMAKE_BUNDLE_DATA += BundleFiles
+    QMAKE_INFO_PLIST = resources/os/mac/Info.plist
 }
 
 
@@ -101,47 +104,73 @@ macx {
 
 CONFIG(debug, debug|release) {
 
-    windows {
-        LIBS += -L$$PWD/thirdparty/opencv/lib/win/debug \
-            -lopencv_core4100d \
-            -lopencv_aruco4100d \
-            -lopencv_imgproc4100d \
-            -lopencv_ximgproc4100d \
-            -lopencv_videoio4100d \
-            -lopencv_objdetect4100d \
-            -lopencv_calib3d4100d \
-            -lopencv_flann4100d \
-            -lopencv_features2d4100d \
-            -lopencv_dnn4100d \
-            -lopencv_imgcodecs4100d
-        DEPENDPATH += $$PWD/thirdparty/opencv/bin/debug
-    }
+    DDIR = debug
+
+    # use precompiled OpenCV or use your own dependency
+    OPENCV_LIBS = $$PWD/thirdparty/opencv/lib/win/debug
+    OPENCV_BINS = $$PWD/thirdparty/opencv/bin/debug
+    OPENCV_VERSION = 4100d
 }
 
 
 CONFIG(release, debug|release) {
 
-    windows {
-        LIBS += -L$$PWD/thirdparty/opencv/lib/win/release \
-            -lopencv_core4100 \
-            -lopencv_aruco4100 \
-            -lopencv_imgproc4100 \
-            -lopencv_ximgproc4100 \
-            -lopencv_videoio4100 \
-            -lopencv_objdetect4100 \
-            -lopencv_calib3d4100 \
-            -lopencv_flann4100 \
-            -lopencv_features2d4100 \
-            -lopencv_dnn4100 \
-            -lopencv_imgcodecs4100
-        DEPENDPATH += $$PWD/thirdparty/opencv/bin/release
-    }
+    DDIR = release
+
+    # use precompiled OpenCV or use your own dependency
+    OPENCV_LIBS = $$PWD/thirdparty/opencv/lib/win/release
+    OPENCV_BINS = $$PWD/thirdparty/opencv/bin/release
+    OPENCV_VERSION = 4100
 }
 
+
 windows {
+
+    INCLUDEPATH += \
+        thirdparty/opencv/include/windows
+
+    RC_ICONS = $$PWD/resources/icon/PaperScopeIcon.ico
+
+    LIBS += -L$$OPENCV_LIBS \
+        -lopencv_core$${OPENCV_VERSION} \
+        -lopencv_aruco$${OPENCV_VERSION} \
+        -lopencv_imgproc$${OPENCV_VERSION} \
+        -lopencv_ximgproc$${OPENCV_VERSION} \
+        -lopencv_videoio$${OPENCV_VERSION} \
+        -lopencv_video$${OPENCV_VERSION} \
+        -lopencv_objdetect$${OPENCV_VERSION} \
+        -lopencv_calib3d$${OPENCV_VERSION} \
+        -lopencv_flann$${OPENCV_VERSION} \
+        -lopencv_features2d$${OPENCV_VERSION} \
+        -lopencv_dnn$${OPENCV_VERSION} \
+        -lopencv_imgcodecs$${OPENCV_VERSION}
+    DEPENDPATH += $$PWD/thirdparty/opencv/bin/$$DDIR
+
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_core$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_aruco$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_imgproc$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_ximgproc$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_videoio$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_video$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_objdetect$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_calib3d$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_flann$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_features2d$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_dnn$${OPENCV_VERSION}.dll
+    EXTRA_BINFILES += $$OPENCV_BINS/opencv_imgcodecs$${OPENCV_VERSION}.dll
    
     LIBS += -L$$PWD/thirdparty/tensorflow-lite/lib/win -ltensorflowlite.dll.if
     DEPENDPATH += $$PWD/thirdparty/tensorflow-lite/lib/win
+
+    EXTRA_BINFILES += $$PWD/thirdparty/tensorflow-lite/bin/tensorflowlite.dll
+    EXTRA_BINFILES += $$PWD/thirdparty/tbb/lib/tbb12.dll
+    EXTRA_BINFILES += $$PWD/resources/keras/shape-classifier_v4.tflite
+    
+    for(FILE,EXTRA_BINFILES){
+        win32:FILE ~= s,/,\\,g
+        win32:DDIR ~= s,/,\\,g
+        QMAKE_POST_LINK += $$quote(cp $${FILE} $$DDIR $$escape_expand(\\n\\t))
+    }
 }
 
 

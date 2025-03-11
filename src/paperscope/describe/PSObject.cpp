@@ -29,19 +29,11 @@
 
         // init properties
         colorIndex = 0;
-
-        // set random uid as string
+		confidence = 4;
 		uid = QString::number(QRandomGenerator::global()->bounded(100000,999999)).toStdString();
 
-		// normalize points
-		for(cv::Point &p : candidatePoints) {
-			cv::Point2f point;
-			point.x = (float) p.x / (float) matTracking->cols;
-			point.y = (float) p.y / (float) matTracking->rows;
-			points.push_back(point);
-		}
-
-		confidence = 4;
+		// init member
+        normalizeCandidates();
 	}	
 
  
@@ -65,21 +57,50 @@
 		if(distance < 10) { 
 			confidence += shapeType != targetShape ? 2 : 8;
 			if(confidence > 100) { confidence = 100; }
+            //if(shapeType == targetShape) { lerp(targetPoints); }
 			return true;
 		}
 
 		// overlapping bounding boxes
-		if(targetShape == PSShapeType::Street || shapeType == PSShapeType::Street) { return false; }
+        if((targetShape == PSShapeType::Street || shapeType == PSShapeType::Street) && targetShape != shapeType) { return false; }
+
 		cv::Rect intersection = rect & rectTarget;
 		float overlap = (float) intersection.area() / (float) rect.area();
 		if(overlap > 0.5) { 
 			confidence += shapeType != targetShape ? 2 : 8;
 			if(confidence > 100) { confidence = 100; }
+            //if(shapeType == targetShape) { lerp(targetPoints); }
 			return true;
 		}
 
 		return false;
 	}
+
+
+    void PSObject::normalizeCandidates() {
+
+        points.clear();
+
+        // normalize points to fit in 0-1 range for tracking area
+		for(cv::Point &p : candidatePoints) {
+			cv::Point2f point;
+			point.x = (float) p.x / (float) matTracking->cols;
+			point.y = (float) p.y / (float) matTracking->rows;
+			points.push_back(point);
+		}
+    }
+
+
+    void PSObject::lerp(std::vector<cv::Point> targetPoints) {
+
+        // lerp points
+        for(size_t i = 0; i < candidatePoints.size(); i++) {
+            candidatePoints[i].x = candidatePoints[i].x * 0.99 + targetPoints[i].x * 0.01;
+            candidatePoints[i].y = candidatePoints[i].y * 0.99 + targetPoints[i].y * 0.01;
+        }
+
+        normalizeCandidates();
+    }
 
 
 

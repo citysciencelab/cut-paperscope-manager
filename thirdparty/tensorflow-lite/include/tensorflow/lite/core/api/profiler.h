@@ -87,8 +87,8 @@ class Profiler {
   // Signals an end to the specified profile event with 'event_metadata's, This
   // is useful when 'event_metadata's are not available when the event begins
   // or when one wants to overwrite the 'event_metadata's set at the beginning.
-  virtual void EndEvent(uint32_t event_handle, int64_t event_metadata1,
-                        int64_t event_metadata2) {
+  virtual void EndEvent(uint32_t event_handle, int64_t event_metadata1, int64_t event_metadata2) {
+
     // By default discards the metadata.
     EndEvent(event_handle);
   }
