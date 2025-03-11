@@ -74,17 +74,52 @@ pkg-config --modversion opencv4
 ```
 If the installation is successful, you should see the version number of OpenCV.
 
+
 ### 2. QT Creator
 
 Open the Qt Creator application and the PaperScope project via the `PaperScopeManager.pro` file located in the root directory of the repository.
 
 Configure the project to use the appropriate Qt kit for your platform.
 
+
+#### Initial Config - Windows
+
+The PaperScope Manager application relies on several external dependencies, including OpenCV and TensorFlow Lite. These dependencies need to be properly configured in the PaperScopeManager.pro file to ensure the application builds and runs correctly. 
+
+Ensure that the paths to the OpenCV and TensorFlow Lite libraries and include directories are correctly set according to your system's configuration. This setup will allow the PaperScope Manager to utilize these external dependencies effectively.
+
+```
+# use precompiled OpenCV or use your own dependency
+OPENCV_LIBS = $$PWD/thirdparty/opencv/lib/win/release
+OPENCV_BINS = $$PWD/thirdparty/opencv/bin/release
+OPENCV_VERSION = 4100
+```
+
+Additionally, the necessary DLL files will be automatically copied to the build folder during the build process, ensuring that all required binaries are available for the application to run.
+
+#### Initial Config - Mac
+
+Depending on your system's hardware, you need to configure TensorFlow Lite for either Intel chips or Apple Silicon.
+
+```
+BundleFiles.files += \
+    $$PWD/thirdparty/tensorflow-lite/lib/mac/libtensorflowlite.dylib \
+    #$$PWD/thirdparty/tensorflow-lite/lib/mac/libtensorflowlite_intel.dylib \
+```
+
+#### Execute app from editor
+
 Build the project by clicking on the "Build" button or selecting `Build > Build Project` from the menu.
 
 Run the application by clicking on the "Run" button or selecting `Build > Run` from the menu.
 
 
+#### Create standalone app 
+
+Qt offers a CLI deployment tool that simplifies the creation of standalone applications. For more details, please refer to the Qt documentation.
+
+Windows:
+Mac: https://doc.qt.io/qt-6/macos-deployment.html#the-mac-deployment-tool
 
 
 ## How To Use
