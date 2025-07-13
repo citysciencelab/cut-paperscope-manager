@@ -57,7 +57,7 @@
 		  networkManager(nullptr)
 	{
 		// init properties
-		baseUrl = Settings::instance()->getString("server_url","https://dev.hello-nasty.com/hcu/paperscope-prod/");
+		baseUrl = Settings::instance()->getString("server_url","https://paperscope.comodeling.city/");
 
 		// init member
 		initSettings();
@@ -133,7 +133,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
 
-    void Api::postResponse(QString url, QJsonObject json, std::function<void(QJsonObject data)> callback) {
+	void Api::postResponse(QString url, QJsonObject json, std::function<void(QJsonObject data)> callback) {
 
 		// create url
 		QUrl qurl = baseUrl + url;
@@ -144,12 +144,12 @@
 		QNetworkRequest request(qurl);
 		
 		// create headers
-        request.setRawHeader("Content-Type", "application/json");
+		request.setRawHeader("Content-Type", "application/json");
 		request.setRawHeader("X-Native-App", "true");
 		request.setRawHeader("Accept", "application/json");
 		request.setRawHeader("Accept-Language", "de");
 		request.setRawHeader("Accept-Encoding", "gzip, deflate");
-		request.setRawHeader("Authorization", "Bearer 9e2377d6-8e70-4ad7-8721-2a0b9c987967|7a7wQWQkWc0QJJR16eaKKJ1XMxYxSL1BFJXo0Wg68dca2f81");
+		request.setRawHeader("Authorization", "Bearer 9f0141be-a692-48af-b170-9393c289a39d|kCFL9JrjoK2ztFcAPc5FEYi74vl3L6sz5TYCZfTSc9d1e6e2");
 
 		// send request
 		QNetworkReply *reply = networkManager->post(request, data);
@@ -191,9 +191,9 @@
 	void Api::onError(QNetworkReply *reply) {
 
 		// log error
-        QString errorMessage = reply->errorString();
+		QString errorMessage = reply->errorString();
 		QString errorCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
-		qDebug() << "Api-Error " << errorCode << ":" << errorMessage;
+		qDebug() << "Api-Error " << reply->url() << errorCode << ":" << errorMessage;
 
 		// emit error
 		emit error(errorMessage, errorCode.toInt(), reply->url().toString());

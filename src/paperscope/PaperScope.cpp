@@ -91,9 +91,11 @@
 			// update paperscope
 			psCapture->update(matTracking, matRender, trackingMode);
 			bool wait = psCalibrate->update(matTracking, matRender, trackingMode);
-			psDetect->update(matTracking, matRender, trackingMode);
-			psDescribe->update(matTracking, matRender, psDetect->matStreets, trackingMode, psDetect->candidates);
-
+            bool motionDetected = psDetect->update(matTracking, matRender, trackingMode);
+            if(!motionDetected) {
+                psDescribe->update(matTracking, matRender, psDetect->matStreets, trackingMode, psDetect->candidates);
+            }
+            
 			// finish loop
 			updateRenderer();
             if(wait) { QThread::msleep(2000); }

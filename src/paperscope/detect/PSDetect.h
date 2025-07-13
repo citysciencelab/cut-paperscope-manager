@@ -47,7 +47,7 @@ class PSDetect : public QObject {
 
 		// processing
 		void init();
-		void update(cv::Mat *mTracking, cv::Mat *mRender, PSTrackingMode trackingMode);
+		bool update(cv::Mat *mTracking, cv::Mat *mRender, PSTrackingMode trackingMode);
 		void close();
 
 		// opencv
@@ -55,11 +55,14 @@ class PSDetect : public QObject {
 		cv::Mat *matProcessing;
 		cv::Mat *matThreshold;
 		cv::Mat *matRender;
+        cv::Mat *matMotion;
 
 		// image processing
 		void imageProcessing();
+        bool detectMotion();
 		void whiteBalance(cv::Mat &mat);
 		void drawHistogram(cv::Mat &value);
+        int motionCounter;
 
 		// detection
 		void applyThreshold();

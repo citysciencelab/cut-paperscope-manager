@@ -4,5 +4,7 @@
 		<file>svg/header-logo.svg</file>
 		<file>svg/icons/qcombobox-arrow.svg</file>
 		<file>svg/icons/separator.svg</file>
+		<file>svg/icons/websocket-connected.svg</file>
+		<file>svg/icons/websocket-disconnected.svg</file>
 	</qresource>
 </RCC>

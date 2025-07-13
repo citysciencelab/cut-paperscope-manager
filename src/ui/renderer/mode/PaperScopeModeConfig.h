@@ -11,9 +11,10 @@
 	#include <QWidget>
 	#include <QLabel>
 	#include <QGridLayout>
+	#include <QHBoxLayout>
 	#include <QComboBox>
 	#include <QSlider>
-    #include <QPushButton>
+	#include <QPushButton>
 
 	// App
 	#include "../../../paperscope/PaperScope.h"
@@ -42,6 +43,9 @@ class PaperScopeModeConfig : public QWidget {
 		// ui
 		void initUserInterface();
 		QGridLayout *layout;
+		QHBoxLayout *buttonLayout;
+		QPushButton *beamerButton;
+		QPushButton *visualizerButton;
 
 		// paperscope
 		void initPaperScope();
@@ -76,5 +80,7 @@ class PaperScopeModeConfig : public QWidget {
 		void onRedChanged(int value);
 		void onSmoothingChanged(int value);
 		void onDatasetClicked();
+		void onBeamerButtonClicked();
+		void onVisualizerButtonClicked();
 };
 

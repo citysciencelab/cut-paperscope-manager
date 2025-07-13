@@ -141,6 +141,7 @@
 
 		QString selectedCamera = Settings::instance()->getString("cameraDevice");
 		selectedCamera.replace(" ", "_");
+		selectedCamera.replace(".", "_");
 
 		Settings::instance()->saveMat("cameraMatrix_"+selectedCamera, cameraMatrix);
 		Settings::instance()->saveMat("distCoeffs_"+selectedCamera, distCoeffs);

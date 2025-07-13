@@ -118,8 +118,7 @@ Run the application by clicking on the "Run" button or selecting `Build > Run` f
 
 Qt offers a CLI deployment tool that simplifies the creation of standalone applications. For more details, please refer to the Qt documentation.
 
-Windows: https://doc.qt.io/qt-6/windows-deployment.html#the-windows-deployment-tool
-
+Windows:
 Mac: https://doc.qt.io/qt-6/macos-deployment.html#the-mac-deployment-tool
 
 

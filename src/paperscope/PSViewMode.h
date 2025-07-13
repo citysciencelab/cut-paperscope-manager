@@ -22,5 +22,6 @@ enum class PSViewMode {
 	Threshold,
 	Streets,
 	BoundingBoxes,
-	Contours
+	Contours,
+    Motion
 };

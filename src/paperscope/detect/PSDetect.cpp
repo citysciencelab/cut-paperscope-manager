@@ -40,6 +40,8 @@
 		  matProcessing(nullptr),
 		  matThreshold(nullptr),
 		  matRender(nullptr),
+          matMotion(nullptr),
+          motionCounter(0),
 		  matStreets(nullptr),
 		  model(nullptr),
 		  resolver(nullptr),
@@ -49,6 +51,7 @@
 		// init properties
 		matProcessing = new cv::Mat();
 		matThreshold = new cv::Mat();
+        matMotion = new cv::Mat();
 		matStreets = new cv::Mat();
 		thresholdDark = Settings::instance()->getInt("threshold_dark",50);
 		thresholdLight = Settings::instance()->getInt("threshold_light",180);
@@ -65,6 +68,7 @@
 
 		delete matProcessing;
 		delete matThreshold;
+        delete matMotion;
 		delete matStreets;
 	}
 
@@ -82,7 +86,7 @@
 	}
 
 
-	void PSDetect::update(cv::Mat *mTracking, cv::Mat *mRender, PSTrackingMode trackingMode) {
+	bool PSDetect::update(cv::Mat *mTracking, cv::Mat *mRender, PSTrackingMode trackingMode) {
 
 		matTracking = mTracking;
 		matRender = mRender;
@@ -93,11 +97,12 @@
 			if(renderMode == RenderMode::PaperScope) {
 				*matRender = cv::Mat::zeros(cv::Size(matRender->cols, matRender->rows), CV_8UC3);
 			}
-			return;
+			return false;
 		}
 
 		imageProcessing();
 		applyThreshold();
+        if(detectMotion()) { return true; }
 
 		if(trackingMode == PSTrackingMode::Tracking) {
 
@@ -110,6 +115,8 @@
 			cv::cvtColor(*matThreshold, *matThreshold, cv::COLOR_GRAY2BGR);
 			cv::bitwise_and(*matTracking, *matThreshold, *matTracking);
 		}
+
+        return false;
 	}
 
 
@@ -205,6 +212,51 @@
 
 		*matProcessing = value.clone();
 	}
+
+
+    bool PSDetect::detectMotion() {
+
+        // init motion detection
+        if(matMotion->empty()) {
+            matMotion->create(matTracking->size(), CV_8UC1);
+            matMotion->setTo(cv::Scalar(0));
+            cv::cvtColor(*matTracking, *matMotion, cv::COLOR_BGR2GRAY);
+        }
+
+        // mats must match in size
+        if(matTracking->size() != matMotion->size()) {
+            cv::cvtColor(*matTracking, *matMotion, cv::COLOR_BGR2GRAY);
+        }
+
+        // perform motion detection
+        cv::Mat matGray;
+        cv::Mat diff;
+        cv::cvtColor(*matTracking, matGray, cv::COLOR_BGR2GRAY);
+        cv::absdiff(matGray, *matMotion, diff);
+        cv::threshold(diff, diff, 30, 255, cv::THRESH_BINARY);
+        *matMotion = matGray.clone();
+
+        // remove noise
+        cv::Mat kernelErode = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+        cv::erode(diff, diff, kernelErode);
+
+        // render motion detection
+        if(renderMode == RenderMode::PaperScope && viewMode == PSViewMode::Motion) {
+            cv::cvtColor(diff, *matRender, cv::COLOR_GRAY2BGR);
+        }
+
+        // calculate value for motion detection
+        cv::Scalar mean = cv::mean(diff);
+        if(mean[0] > 0.5) { motionCounter = 50.0; }
+
+        if(motionCounter > 0) {
+            motionCounter--;
+            cv::putText(*matRender, "Motion detected", cv::Point(30, matRender->rows - 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
+            return true;
+        }
+
+        return false;
+    }
 
 
 	void PSDetect::whiteBalance(cv::Mat &mat) {
@@ -449,7 +501,7 @@
 		if(renderMode != RenderMode::PaperScope) { return; }
 
 		// render threshold mat
-		if(viewMode > PSViewMode::Streets) {
+		if(viewMode > PSViewMode::Streets && viewMode != PSViewMode::Motion) {
 			cv::cvtColor(*matThreshold, *matRender, cv::COLOR_GRAY2BGR);
 			cv::multiply(*matRender, 0.25, *matRender);
 		}

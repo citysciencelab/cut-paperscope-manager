@@ -10,6 +10,7 @@
 	// Qt
 	#include <QWidget>
 	#include <QGridLayout>
+	#include <QHBoxLayout>
 	#include <QLabel>
 	#include <QLineEdit>
 	#include <QPushButton>
@@ -39,8 +40,11 @@ class PreferencesTab : public QWidget {
 	private:
 
 		// ui
-        void initUserInterface();
-        QGridLayout *layout;
+		void initUserInterface();
+		void initButtons();
+		QGridLayout *layout;
+		QHBoxLayout *buttonLayout;
+		QPushButton *buttonReset;
 		QPushButton *buttonSave;
 
 		// server
@@ -57,6 +61,7 @@ class PreferencesTab : public QWidget {
 
 	public slots:
 
+		void reset();
 		void save();
 
 };

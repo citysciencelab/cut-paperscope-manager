@@ -42,7 +42,7 @@
 		smoothingFactor = Settings::instance()->getFloat("smoothing", 0.8f);
 		scalingFactor = Settings::instance()->getFloat("scaling", 1.0f);
 		calibrationMode = Settings::instance()->getString("calibration_mode", "auto");
-        manualImagePoints = Settings::instance()->getPoints("calibration_points");
+		manualImagePoints = Settings::instance()->getPoints("calibration_points");
 
 		// init member
 		updatePlaneSize();
@@ -80,7 +80,6 @@
 		*matRender = matTracking->clone();
 		
 		if(trackingMode != PSTrackingMode::Calibrate) {
-			processImage();
 			findArucoMarker();
 			drawArucoMarker();
 		}
@@ -95,19 +94,6 @@
 	void PSCapture::close() {
 
 		capture->release();
-	}
-
-
-
-/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//	IMAGE PROCESSING
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
-
-
-	void PSCapture::processImage() {
-
 	}
 
 
@@ -256,10 +242,10 @@
 		// plane size in meters
 		if(ratio >= 0.300f / 0.210f) {
 			planeWidth = 0.300f - markerPadding * 2;
-            planeHeight = (0.300f/ratio) - (markerPadding * 2);
+			planeHeight = (0.300f/ratio) - (markerPadding * 2);
 		}
 		else {
-            planeWidth = (0.210f * ratio) - (markerPadding * 2);
+			planeWidth = (0.210f * ratio) - (markerPadding * 2);
 			planeHeight = 0.210f - markerPadding * 2;
 		}
 
@@ -301,26 +287,49 @@
 	void PSCapture::openCamera() {
 
 		QString selectedCamera = Settings::instance()->getString("cameraDevice");
-		int index = 0;
 
-		// get selected/saved camera
+		findCameraByName("Macbook");
+
+		// find selected/saved camera
+		bool camIndex = 0;
 		if(!selectedCamera.isEmpty()) {
 			QList<QCameraDevice> availableCameras = QMediaDevices::videoInputs();
 			for(int i = 0; i < availableCameras.size(); i++) {
+				qDebug() << "Camera " << i << ": " << availableCameras[i].description();
 				if(availableCameras[i].description() == selectedCamera) { 
-					index = i;
+					camIndex = i;
 					break; 
 				}
 			}
 		}
 
+		qDebug() << "Opening camera: " << selectedCamera << " (index: " << (int) camIndex << ")";
+
 		// open camera
 		#if defined(Q_OS_WIN)
-			capture->open(index, cv::CAP_DSHOW);
+			capture->open(camIndex, cv::CAP_DSHOW);
 			// capture->open(index + 1 + cv::CAP_DSHOW);
 		#elif defined(Q_OS_MAC)
-			capture->open(index);
+			capture->open(camIndex);
 		#endif
+	}
+
+
+	int PSCapture::findCameraByName(QString cameraName) {
+
+		
+
+		// DeviceEnumerator de;
+		// devices = de.getVideoDevicesMap();
+
+		// // Print information about the devices
+		// for (auto const &device : devices) {
+		//     std::cout << "== VIDEO DEVICE (id:" << device.first << ") ==" << std::endl;
+		//     std::cout << "Name: " << device.second.deviceName << std::endl;
+		//     std::cout << "Path: " << device.second.devicePath << std::endl;
+		// }
+
+		return 0;
 	}
 
 
@@ -372,6 +381,7 @@
 		
 		QString selectedCamera = Settings::instance()->getString("cameraDevice");
 		selectedCamera.replace(" ", "_");
+		selectedCamera.replace(".", "_");
 
 		// make default camera calibration
 		cameraMatrix = Settings::instance()->getMat("cameraMatrix_"+selectedCamera,cv::Mat::eye(3, 3, CV_64F));

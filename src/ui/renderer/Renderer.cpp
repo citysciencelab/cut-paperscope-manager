@@ -10,6 +10,7 @@
 	// App
 	#include "../../MainWindow.h"
 	#include "../../global/Settings.h"
+	#include "../../global/Broadcast.h"
 
 
 
@@ -23,7 +24,10 @@
 	Renderer::Renderer(QWidget *parent)
 		: QWidget(parent),
 		  layout(nullptr),
+          tabLayout(nullptr),
 		  tabBar(nullptr),
+          spacer(nullptr),
+          websocketStatus(nullptr),
 		  renderMode(RenderMode::Camera),
 		  cameraModeConfig(nullptr),
           calibrationMode("auto"),
@@ -55,8 +59,11 @@
 
 	Renderer::~Renderer() {
 
-		delete layout;
 		delete tabBar;
+        delete spacer;
+        delete websocketStatus;
+        delete tabLayout;
+		delete layout;
 
 		delete cameraModeConfig;
 		delete paperScopeModeConfig;
@@ -79,21 +86,46 @@
 	void Renderer::initUserInterface() {
 
 		// layout
-		layout = new QVBoxLayout();
+        layout = new QVBoxLayout(this);
 		layout->setContentsMargins(0,15,0,0);
 		layout->setSpacing(10);
 		setLayout(layout);
 
+        // tab layout
+        tabLayout = new QHBoxLayout(this);
+        tabLayout->setContentsMargins(10,0,10,0);
+        tabLayout->setSpacing(0);
+        layout->addLayout(tabLayout);
+
+        // spacer
+        spacer = new QWidget(this);
+        spacer->setFixedSize(26,26);
+        tabLayout->addWidget(spacer);
+        tabLayout->setAlignment(spacer, Qt::AlignLeft);
+
 		// tabs
-		tabBar = new QTabBar();
+        tabBar = new QTabBar(this);
 		tabBar->addTab("Camera");
 		tabBar->addTab("PaperScope");
 		tabBar->addTab("Preferences");
-		layout->addWidget(tabBar);
-		layout->setAlignment(tabBar, Qt::AlignCenter);
+		tabLayout->addWidget(tabBar);
+        tabLayout->setAlignment(tabBar, Qt::AlignCenter);
+
+        // websocket status
+		websocketStatus = new QPushButton("",this);
+        websocketStatus->setObjectName("websocketStatus");
+        websocketStatus->setCursor(Qt::PointingHandCursor);
+        websocketStatus->setCheckable(true);
+        websocketStatus->setIcon(QIcon(":/svg/icons/websocket-disconnected.svg"));
+        websocketStatus->setIconSize(QSize(26,26));
+		tabLayout->addWidget(websocketStatus);
+        tabLayout->setAlignment(websocketStatus, Qt::AlignRight);
 
 		// events
 		connect(tabBar, &QTabBar::currentChanged, this, &Renderer::onTabChanged);
+		connect(websocketStatus, &QPushButton::clicked, this, &Renderer::toggleWebsocket);
+        connect(Broadcast::instance(), &Broadcast::connected, this, &Renderer::onWebsocketConnected);
+        connect(Broadcast::instance(), &Broadcast::closed, this, &Renderer::onWebsocketClosed);
 	}
 
 
@@ -113,6 +145,31 @@
         paperScopeModeConfig->setVisible(renderMode == RenderMode::PaperScope);
         preferencesTab->setVisible(renderMode == RenderMode::Preferences);
 	}
+
+
+    void Renderer::toggleWebsocket() {
+
+        if(!websocketStatus->isChecked()) {
+            Broadcast::instance()->closeWebsocket();
+        }
+        else {
+            Broadcast::instance()->connectWebsocket();
+        }
+    }
+
+
+    void Renderer::onWebsocketConnected() {
+
+        websocketStatus->setChecked(true);
+        websocketStatus->setIcon(QIcon(":/svg/icons/websocket-connected.svg"));
+    }
+
+
+    void Renderer::onWebsocketClosed() {
+
+        websocketStatus->setChecked(false);
+        websocketStatus->setIcon(QIcon(":/svg/icons/websocket-disconnected.svg"));
+    }
 
 
 

@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = "PaperScope Manager"
 
 QT += core core5compat gui widgets multimedia svgwidgets network websockets
+#QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
 
 CONFIG += c++17
 

@@ -16,6 +16,7 @@
 	#include <QTabBar>
 	#include <QVBoxLayout>
 	#include <QLabel>
+	#include <QPushButton>
 
 	// OpenCV
 	#include <opencv2/opencv.hpp>
@@ -52,7 +53,10 @@ class Renderer : public QWidget {
 		// ui
         void initUserInterface();
 		QVBoxLayout *layout;
+        QHBoxLayout *tabLayout;
 		QTabBar *tabBar;
+        QWidget *spacer;
+        QPushButton *websocketStatus;
 
 		// renderer
 		void initRenderer();
@@ -92,6 +96,9 @@ class Renderer : public QWidget {
 
 		// ui
 		void onTabChanged(int index);
+        void toggleWebsocket();
+        void onWebsocketConnected();
+        void onWebsocketClosed();
 
 		// calibrate
 		void startManualCalibrate();

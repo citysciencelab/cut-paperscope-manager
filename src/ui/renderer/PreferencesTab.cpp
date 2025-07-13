@@ -23,6 +23,8 @@
 	PreferencesTab::PreferencesTab(QWidget *parent)
 		: QWidget(parent),
 		  layout(nullptr),
+		  buttonLayout(nullptr),
+		  buttonReset(nullptr),
 		  buttonSave(nullptr),
 		  labelServerUrl(nullptr),
 		  inputServerUrl(nullptr),
@@ -32,19 +34,11 @@
 		  inputPaperscopeScaling(nullptr)
 	{
 
-		// init properties	
-
 		// init member
 		initUserInterface();
 		initServerInput();
 		initPaperscopeInput();
-		save();
-
-		// button save
-		buttonSave = new QPushButton("Save");
-		buttonSave->setFixedWidth(170);
-		layout->addWidget(buttonSave, 4, 2, Qt::AlignRight);
-		connect(buttonSave, &QPushButton::clicked, this, &PreferencesTab::save);
+		initButtons();
 	}
 
 
@@ -73,6 +67,30 @@
 	}
 
 
+	void PreferencesTab::initButtons() {
+
+		// button layout
+		buttonLayout = new QHBoxLayout();
+
+		// reset button
+		buttonReset = new QPushButton("Reset");
+		buttonReset->setFixedWidth(130);
+        buttonReset->setObjectName("outline");
+        buttonReset->setCursor(Qt::PointingHandCursor);
+        buttonLayout->addWidget(buttonReset);
+		connect(buttonReset, &QPushButton::clicked, this, &PreferencesTab::reset);
+
+		// save button
+		buttonSave = new QPushButton("Save");
+		buttonSave->setFixedWidth(170);
+        buttonSave->setCursor(Qt::PointingHandCursor);
+        buttonLayout->addWidget(buttonSave);
+		connect(buttonSave, &QPushButton::clicked, this, &PreferencesTab::save);
+
+		layout->addLayout(buttonLayout, 4, 2);
+	}
+
+
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -89,7 +107,7 @@
 
 		// input server url
 		inputServerUrl = new QLineEdit();
-        inputServerUrl->setText(Settings::instance()->saveString("server_url", "https://dev.hello-nasty.com/hcu/paperscope-prod/"));
+		inputServerUrl->setText(Settings::instance()->getString("server_url","https://paperscope.comodeling.city/"));
 		layout->addWidget(inputServerUrl, 1, 0);
 
 		// label websocket port
@@ -98,7 +116,7 @@
 
 		// input websocket port
 		inputWebsocketPort = new QLineEdit();
-        inputWebsocketPort->setText(Settings::instance()->saveString("websocket_port", "443"));
+		inputWebsocketPort->setText(Settings::instance()->getString("websocket_port", "443"));
 		layout->addWidget(inputWebsocketPort, 1, 2);
 	}
 
@@ -119,7 +137,7 @@
 
 		// input scaling
 		inputPaperscopeScaling = new QLineEdit();
-        inputPaperscopeScaling->setText(QString::number(Settings::instance()->saveFloat("scaling", 1.0)));
+		inputPaperscopeScaling->setText(QString::number(Settings::instance()->getFloat("scaling", 1.0)));
 		layout->addWidget(inputPaperscopeScaling, 3, 0);
 	}
 
@@ -137,11 +155,22 @@
 		// validate input
 		QString serverUrl = inputServerUrl->text();
 		if(!serverUrl.endsWith("/")) { serverUrl.append("/"); }
-        QString scaling = inputPaperscopeScaling->text().replace(",", ".");
-        inputPaperscopeScaling->setText(scaling);
+		QString scaling = inputPaperscopeScaling->text().replace(",", ".");
+		inputPaperscopeScaling->setText(scaling);
 
 		// save settings
-        Settings::instance()->saveString("server_url", serverUrl);
-        Settings::instance()->saveString("websocket_port", inputWebsocketPort->text());
+		Settings::instance()->saveString("server_url", serverUrl);
+		Settings::instance()->saveString("websocket_port", inputWebsocketPort->text());
 		Settings::instance()->saveFloat("scaling", scaling.toFloat());
+		Settings::instance()->save();
+	}
+
+
+	void PreferencesTab::reset() {
+
+		inputServerUrl->setText(Settings::instance()->saveString("server_url", "https://paperscope.comodeling.city/"));
+		inputWebsocketPort->setText(Settings::instance()->saveString("websocket_port", "443"));
+		inputPaperscopeScaling->setText(QString::number(Settings::instance()->saveFloat("scaling", 1.0)));
+
+		save();
 	}

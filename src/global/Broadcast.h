@@ -36,6 +36,8 @@ class Broadcast : public QObject {
 		~Broadcast();
 
 		// websocket
+		void connectWebsocket();
+        void closeWebsocket();
 		void sendMessage(QString message);
 		void sendMessage(QJsonObject data);
 
@@ -51,10 +53,9 @@ class Broadcast : public QObject {
 		Broadcast();
 
 		// websocket
-		void connectWebSocket();
 		QWebSocket *webSocket;
 		QString webSocketPort;
-		QString webSocketAppId;
+		QString webSocketAppKey;
 		QString webSocketId;
 		QMap<QString,QString> webSocketAuth;
 
@@ -84,6 +85,7 @@ class Broadcast : public QObject {
 
 		// pusher
 		void sendPing();
+		void subscribeChannel(QString channel);
 		void subscribePrivateChannel(QString channel);
 		void onChannelMessage(QString message);
 

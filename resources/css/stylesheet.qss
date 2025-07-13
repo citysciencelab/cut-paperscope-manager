@@ -96,13 +96,22 @@
 		margin: 0 0 5px 0;
 	}
 
-
 	QPushButton#secondary:hover {
 		
 		color: #1C58A4;
 		border-color: #1C58A4;
 	}
 
+    QPushButton#outline {
+
+        height: 36px;
+		font-size: 14px;
+		font-weight: bold;
+		border-radius: 18px;
+		background-color: #fff;
+		color: #378ADC;
+		border-color: #378ADC;
+	}
 
 	QPushButton#btnRealtime {
 
@@ -120,6 +129,17 @@
 		color: #fff;
 		margin: 0 20px 5px 20px;
 	}
+
+
+    QPushButton#websocketStatus {
+
+        width: 26px;
+        height: 26px;
+        background-color: #fff;
+        border-color: #fff;
+        margin: 0;
+        padding: 0;
+    }
 
 
 

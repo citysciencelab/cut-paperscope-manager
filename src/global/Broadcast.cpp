@@ -60,11 +60,12 @@
 	{
 		
 		// init properties
-		webSocketAppId = QString("cxu73Avj8Kny2gpEQeLqD4fXTVFPhzMR");
-		webSocketPort = QString("443");
+		webSocketAppKey = QString("cxu73Avj8Kny2gpEQeLqD4fXTVFPhzMR");
+		webSocketPort =  Settings::instance()->getString("websocket_port","443");
 
 		// init member
-		connectWebSocket();	
+        initSettings();
+		connectWebsocket();	
 	}
 
 
@@ -84,11 +85,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
 
-	void Broadcast::connectWebSocket() {
+	void Broadcast::connectWebsocket() {
 
 		// create url
 		QString server = Api::instance()->getBaseUrl().split("/").at(2);
-		QUrl url = QUrl("wss://"+server+"/app/"+webSocketAppId+"?protocol=7&client=js&version=8.4.0-rc2&flash=false");
+        QString protocol = server.startsWith("localhost") ? "ws" : "wss";
+		QUrl url = QUrl(protocol+"://"+server+":"+webSocketPort+"/app/"+webSocketAppKey+"?protocol=7&client=js&version=8.4.0-rc2&flash=false");
+
+        qDebug() << "Connecting to Websocket: " << url.toString();  
 
 		// init websocket
 		if(!webSocket) { 
@@ -104,6 +108,21 @@
 		
 		webSocket->open(url);
 	}
+
+
+    void Broadcast::closeWebsocket() {
+
+        if(webSocket) {
+            webSocket->close();
+            webSocket->deleteLater();
+            webSocket = nullptr;
+        }
+
+        webSocketId = "";
+        webSocketAuth.clear();
+
+        qDebug() << "Websocket disconnected";
+    }
 
 
 	// emit connected signal after websocket id is available (see onMessage)
@@ -189,6 +208,7 @@
 
 		if(webSocket) {
 			webSocket->sendTextMessage(message);
+            qDebug() << "Websocket message sent: " << message;
 		}
 	}
 
@@ -235,6 +255,14 @@
 //	PUSHER CHANNELS
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+
+	void Broadcast::subscribeChannel(QString channel) {
+
+		qDebug() << "subscribing to channel: " << channel;
+		QString message = QString("{\"event\":\"pusher:subscribe\",\"data\":{\"channel\":\"%1\"}}").arg(channel);
+		sendMessage(message);
+	}
 
 
 	void Broadcast::subscribePrivateChannel(QString channel) {

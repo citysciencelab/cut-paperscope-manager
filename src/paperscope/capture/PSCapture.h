@@ -53,9 +53,6 @@ class PSCapture : public QObject {
 
 	private:
 
-		// image processing
-		void processImage();
-
 		// aruco marker
 		void findArucoMarker(int id = 16);
 		void drawArucoMarker();
@@ -78,6 +75,7 @@ class PSCapture : public QObject {
 
 		// camera
 		void openCamera();
+        int findCameraByName(QString name);
 		void setCameraProps();
 		cv::Mat cameraMatrix;
 		cv::Mat distCoeffs;

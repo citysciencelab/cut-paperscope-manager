@@ -9,6 +9,7 @@
 
 	// Qt
 	#include <QLabel>
+    #include <QDesktopServices>
 
 
 
@@ -22,6 +23,9 @@
 	PaperScopeModeConfig::PaperScopeModeConfig(PaperScope *paperScope, QWidget *parent)
 		: QWidget(parent),
 		  layout(nullptr),
+		  buttonLayout(nullptr),
+		  beamerButton(nullptr),
+		  visualizerButton(nullptr),
 		  paperScope(paperScope),
 		  selectPaperScopeView(nullptr),
 		  labelThresholdDark(nullptr),
@@ -32,7 +36,6 @@
 		  sliderRed(nullptr),
 		  labelSmoothing(nullptr),
 		  sliderSmoothing(nullptr),
-		
 		  btnDataset(nullptr)
 	{
 
@@ -67,8 +70,54 @@
 		layout->setSpacing(10);
 		layout->setColumnMinimumWidth(1, 30);
 		setLayout(layout);
+
+		// button layout
+		buttonLayout = new QHBoxLayout();
+		buttonLayout->setSpacing(10);
+
+		// beamer button
+		beamerButton = new QPushButton("Beamer",this);
+		beamerButton->setObjectName("secondary");
+		beamerButton->setCursor(Qt::PointingHandCursor);
+		beamerButton->setFixedWidth(70);
+		buttonLayout->addWidget(beamerButton);
+
+		// visualizer button
+		visualizerButton = new QPushButton("Visualizer",this);
+		visualizerButton->setObjectName("secondary");
+		visualizerButton->setCursor(Qt::PointingHandCursor);
+		visualizerButton->setFixedWidth(80);
+		buttonLayout->addWidget(visualizerButton);
+
+		buttonLayout->addStretch(); // Add stretch to align buttons to the left
+		layout->addLayout(buttonLayout, 0, 0);
+
+		// events
+		connect(beamerButton, &QPushButton::clicked, this, &PaperScopeModeConfig::onBeamerButtonClicked);
+		connect(visualizerButton, &QPushButton::clicked, this, &PaperScopeModeConfig::onVisualizerButtonClicked);
 	}
 
+
+	void PaperScopeModeConfig::onBeamerButtonClicked() {
+
+		QString url = Settings::instance()->getString("server_url");
+		url += QString("beamer/");
+		url += Settings::instance()->getString("project_id");
+
+        QDesktopServices::openUrl(QUrl(url));
+	}
+
+
+	void PaperScopeModeConfig::onVisualizerButtonClicked() {
+
+		QString url = Settings::instance()->getString("server_url");
+		url += QString("visualizer/");
+		url += Settings::instance()->getString("project_id");
+
+        QDesktopServices::openUrl(QUrl(url));
+	}
+
+	
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -88,6 +137,7 @@
 		selectPaperScopeView->addItem("Streets");
 		selectPaperScopeView->addItem("Bounding Boxes");
 		selectPaperScopeView->addItem("Contours");
+		selectPaperScopeView->addItem("Motion");
 		selectPaperScopeView->setCurrentIndex(2);
 
 		layout->addWidget(selectPaperScopeView, 0, 1, Qt::AlignRight);
@@ -179,7 +229,7 @@
 	}
 
 
-    void PaperScopeModeConfig::onRedChanged(int value) {
+	void PaperScopeModeConfig::onRedChanged(int value) {
 		
 		Settings::instance()->saveInt("threshold_red", value);
 	}

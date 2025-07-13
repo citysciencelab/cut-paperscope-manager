@@ -201,7 +201,7 @@
 			// subscribe to websocket
 			connect(Broadcast::instance(), &Broadcast::connected, [=](){
 			
-           		Broadcast::instance()->subscribePrivateChannel("project."+projectId.toLower());
+           		Broadcast::instance()->subscribeChannel("project."+projectId.toLower());
 			});
 		});
 	}
