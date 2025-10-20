@@ -168,8 +168,6 @@ Use the four slider in the "Processing" view to optimize the webcam image input.
 
 **Threshold Light**: Increase contrast of drawn shapes for better shape detection. 
 
-**Threshold Red** Modify red color range (hue channel) to optimize street detection.
-
 **Smoothing**: When using the "Calibration Matrix" mode you can smooth out perspective tracking errors and reduce jitter.
 
 ![PaperScope Config 02](assets/paperscope-config-02.jpg)
@@ -177,16 +175,9 @@ Use the four slider in the "Processing" view to optimize the webcam image input.
 
 #### Threshold
 
-The "Tresholding" view should display all desired shapes without streets (red color).
+The "Tresholding" view should display all desired shapes.
 
 ![PaperScope Config 03](assets/paperscope-config-03.png)
-
-
-#### Streets
-
-The "Streets" view should display all streets as thin red lines.
-
-![PaperScope Config 04](assets/paperscope-config-04.png)
 
 
 #### Bounding Boxes

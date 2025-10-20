@@ -43,13 +43,12 @@ class PSDescribe : public QObject {
 
 		// processing
 		void init();
-		void update(cv::Mat *mTracking, cv::Mat *mRender, cv::Mat *mStreets, PSTrackingMode trackingMode, std::vector<PSCandidate> &candidates);
+		void update(cv::Mat *mTracking, cv::Mat *mRender, PSTrackingMode trackingMode, std::vector<PSCandidate> &candidates);
 		void close();
 
 		// opencv
 		cv::Mat *matTracking;
 		cv::Mat *matRender;
-		cv::Mat *matStreets;
 
 		// server
 		void onRequestSent();
@@ -60,9 +59,8 @@ class PSDescribe : public QObject {
 		// scene
 		void updateScene(std::vector<PSCandidate> &candidates);
 		std::vector<PSObject> objects;
-
-		// streets
-		void updateStreets();
+		int countValidObjects;
+		int minConfidence;
 
 		// server
 		void sendRequest();
@@ -73,7 +71,6 @@ class PSDescribe : public QObject {
 
 		// renderer
 		void drawScene(std::vector<PSCandidate> &candidates);
-		void drawStreets();
 		RenderMode renderMode;
         PSViewMode viewMode;
 

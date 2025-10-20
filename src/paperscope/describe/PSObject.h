@@ -42,7 +42,7 @@ class PSObject {
 
 		// contour
 		PSShapeType shapeType;
-		void drawContour();
+		void drawContour(int minConfidence);
 
 		// color detection
 		int colorIndex;
@@ -50,6 +50,7 @@ class PSObject {
 		void detectColor();
 		void drawColor();
 		std::vector< std::vector<cv::Scalar> > getColorCandidates();
+		std::vector<int> colorIndexQueue;
 
 	
 	private:

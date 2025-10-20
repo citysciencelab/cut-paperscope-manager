@@ -93,7 +93,7 @@
 			bool wait = psCalibrate->update(matTracking, matRender, trackingMode);
             bool motionDetected = psDetect->update(matTracking, matRender, trackingMode);
             if(!motionDetected) {
-                psDescribe->update(matTracking, matRender, psDetect->matStreets, trackingMode, psDetect->candidates);
+                psDescribe->update(matTracking, matRender, trackingMode, psDetect->candidates);
             }
             
 			// finish loop

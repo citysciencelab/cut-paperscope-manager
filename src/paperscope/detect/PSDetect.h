@@ -72,10 +72,6 @@ class PSDetect : public QObject {
 		int thresholdLight;
 		int thresholdRed;
 
-		// streets
-		void findStreets();
-		cv::Mat *matStreets;
-
 		// candidates
 		void createCandidate(std::vector<cv::Point> contour);
 		void drawCandidates();

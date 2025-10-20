@@ -43,7 +43,7 @@
 		initUserInterface();
 		initPaperScopeView();
 		initThreshold();
-		initRed();
+		//initRed();
 		initSmoothing();
 		initDataset();
 	}
@@ -134,7 +134,6 @@
 		selectPaperScopeView->addItem("2D Plane");
 		selectPaperScopeView->addItem("Processing");
 		selectPaperScopeView->addItem("Threshold");
-		selectPaperScopeView->addItem("Streets");
 		selectPaperScopeView->addItem("Bounding Boxes");
 		selectPaperScopeView->addItem("Contours");
 		selectPaperScopeView->addItem("Motion");
@@ -220,7 +219,7 @@
 		sliderRed = new QSlider(Qt::Horizontal, this);
 		sliderRed->setMinimum(0);
 		sliderRed->setMaximum(255);
-		sliderRed->setValue(Settings::instance()->getInt("threshold_red", 150));
+		sliderRed->setValue(Settings::instance()->getInt("threshold_red", 0));
 
 		layout->addWidget(labelRed, 3, 0);
 		layout->addWidget(sliderRed, 4, 0);

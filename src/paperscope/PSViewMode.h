@@ -20,7 +20,6 @@ enum class PSViewMode {
 	Plane2D,
 	Processing,
 	Threshold,
-	Streets,
 	BoundingBoxes,
 	Contours,
     Motion

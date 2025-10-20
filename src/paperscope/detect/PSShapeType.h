@@ -22,5 +22,4 @@ enum class PSShapeType {
 	Triangle,
 	Cross,
 	Organic,
-	Street
 };

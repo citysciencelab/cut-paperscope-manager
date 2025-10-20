@@ -42,7 +42,6 @@
 		  matRender(nullptr),
           matMotion(nullptr),
           motionCounter(0),
-		  matStreets(nullptr),
 		  model(nullptr),
 		  resolver(nullptr),
 	 	  interpreter(nullptr)
@@ -52,7 +51,6 @@
 		matProcessing = new cv::Mat();
 		matThreshold = new cv::Mat();
         matMotion = new cv::Mat();
-		matStreets = new cv::Mat();
 		thresholdDark = Settings::instance()->getInt("threshold_dark",50);
 		thresholdLight = Settings::instance()->getInt("threshold_light",180);
 		thresholdRed = Settings::instance()->getInt("threshold_red",150);
@@ -69,7 +67,6 @@
 		delete matProcessing;
 		delete matThreshold;
         delete matMotion;
-		delete matStreets;
 	}
 
 
@@ -107,7 +104,6 @@
 		if(trackingMode == PSTrackingMode::Tracking) {
 
 			findContours();
-			findStreets();
 			drawCandidates();
 
 			// prepare tracking mat for PSDescribe
@@ -152,10 +148,6 @@
 		cv::Mat saturation = hsv[1];
 		cv::Mat value = hsv[2];
 		
-		// streets are detected by red pixels
-		matStreets->create(value.size(), CV_8UC1);
-		matStreets->setTo(cv::Scalar(0));
-		
 		// optimize vue channel
 		cv::bitwise_not(value, value); // invert image for better thresholding
 		for(int i = 0; i < value.rows; i++) {
@@ -171,16 +163,8 @@
 				int g = (*matTracking).at<cv::Vec3b>(i, j)[1];
 				int b = (*matTracking).at<cv::Vec3b>(i, j)[0];
 
-				// extract red pixels for streets
-				float range = thresholdRed/255.0 * 50;
-				bool isRed = r > 50 && (valHue < range || valHue > 180 - range) && valVal > 50 && valSat > 50;
-				if(isRed) { 
-					matStreets->at<uchar>(i, j) = 255; 
-					value.at<uchar>(i, j) = 0;
-				}
-
 				// remove gray pixels
-				else if(r > 150 && abs(r - g) < 10 &&abs(g - b) < 20) { value.at<uchar>(i, j) = 0; }
+                if(r > 150 && abs(r - g) < 10 &&abs(g - b) < 20) { value.at<uchar>(i, j) = 0; }
 				// remove dark pixels
 				else if(valVal < thresholdDark && valSat < thresholdDark) { value.at<uchar>(i, j) = 0; }
 				// add light pixels
@@ -190,25 +174,11 @@
 			}
 		}
 
-		// optimize streets channel and remove red pixels from value channel
-		cv::Mat kernelDilate = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
-		cv::medianBlur(*matStreets, *matStreets, 3);
-		cv::dilate(*matStreets, *matStreets, kernelDilate);
-		cv::subtract(value, *matStreets, value);
-
 		if(renderMode == RenderMode::PaperScope && viewMode == PSViewMode::Processing) {
 			cv::cvtColor(value, *matRender, cv::COLOR_GRAY2BGR);
 		}
 
 		drawHistogram(value);
-
-		// combine rendering of processing with red channel for streets
-		if(renderMode == RenderMode::PaperScope && viewMode == PSViewMode::Processing) {
-			cv::Mat mask = cv::Mat::zeros(matTracking->size(), CV_8UC3);
-			cv::cvtColor(*matStreets, mask, cv::COLOR_GRAY2BGR);
-			cv::bitwise_and(*matTracking, mask, mask);
-			cv::bitwise_or(*matRender, mask, *matRender);
-		}
 
 		*matProcessing = value.clone();
 	}
@@ -423,56 +393,6 @@
 	}
 
 
-/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//	DETECTION
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
-
-
-	void PSDetect::findStreets() {
-
-		// convert shapes to equal lines
-		cv::Mat matThinning;
-		cv::ximgproc::thinning(*matStreets, matThinning);
-
-		if(renderMode == RenderMode::PaperScope && viewMode == PSViewMode::Streets) {
-			cv::Mat channels[3];
-			cv::split(*matRender, channels);
-			channels[0] *= 0.15;
-			channels[1] *= 0.15;
-			channels[2] = matThinning;
-			cv::merge(channels, 3, *matRender);
-		}
-
-		// equal width of streets
-		cv::dilate(matThinning, *matStreets, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6,6)));
-
-		// find contours
-		std::vector<std::vector<cv::Point>> contours;
-		std::vector<cv::Vec4i> hierarchy;
-		cv::findContours(*matStreets, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
-		if(contours.size() == 0) { return; }
-
-		// filter contours
-		for(int i = 0; i < (int) contours.size(); i++) {
-			
-            if(hierarchy[i][3] == -1 && cv::contourArea(contours[i]) > 300) {
-
-				// simplify contour
-				cv::approxPolyDP(contours[i], contours[i], 1, true);
-
-				PSCandidate candidate(contours[i], PSShapeType::Street);
-				candidates.push_back(candidate);
-			}
-		}
-		
-		if(renderMode == RenderMode::PaperScope && viewMode == PSViewMode::BoundingBoxes) {
-			cv::add(*matThreshold, *matStreets, *matThreshold);
-		}
-	}
-
-
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -501,7 +421,7 @@
 		if(renderMode != RenderMode::PaperScope) { return; }
 
 		// render threshold mat
-		if(viewMode > PSViewMode::Streets && viewMode != PSViewMode::Motion) {
+		if(viewMode > PSViewMode::Threshold && viewMode != PSViewMode::Motion) {
 			cv::cvtColor(*matThreshold, *matRender, cv::COLOR_GRAY2BGR);
 			cv::multiply(*matRender, 0.25, *matRender);
 		}

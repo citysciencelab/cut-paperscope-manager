@@ -37,6 +37,7 @@
 		// init properties
 		renderMode = RenderMode::Camera,
 		viewMode = PSViewMode::Threshold;
+		minConfidence = 70;
 		needsRequest = false;
 		isSending = false;
 		timestampSent = QDateTime::currentSecsSinceEpoch();
@@ -64,11 +65,10 @@
 	}
 
 
-	void PSDescribe::update(cv::Mat *mTracking, cv::Mat *mRender, cv::Mat *mStreets, PSTrackingMode trackingMode, std::vector<PSCandidate> &candidates) {
+	void PSDescribe::update(cv::Mat *mTracking, cv::Mat *mRender, PSTrackingMode trackingMode, std::vector<PSCandidate> &candidates) {
 
 		matTracking = mTracking;
 		matRender = mRender;
-		matStreets = mStreets;
 
 		// skip loop
 		if(trackingMode != PSTrackingMode::Tracking || matTracking->empty()) {
@@ -77,10 +77,7 @@
 		}
 		
 		updateScene(candidates);
-		updateStreets();
-
 		drawScene(candidates);
-		//drawStreets();
 	}
 
 
@@ -99,13 +96,8 @@
 
 	void PSDescribe::updateScene(std::vector<PSCandidate> &candidates) {
 
-		int countObjects = 0;
-
-		// update confidence of existing objects
-		for(PSObject &object : objects) { 
-			object.confidence -= 4;
-			if(object.confidence > 20) { countObjects++; }
-		}
+		// reduce confidence of existing objects to filter out old objects
+		for(PSObject &object : objects) { object.confidence -= 5; }
 
 		// iterate all candidates
 		for(PSCandidate &candidate : candidates) {
@@ -128,29 +120,18 @@
 
 		// remove old objects from scene
 		std::vector<PSObject> validObjects;
-		int countValid = 0;
+		int valid = 0;
 		for(int i = 0; i < (int) objects.size(); i++) {
 			if(objects[i].confidence > 0) { validObjects.push_back(objects[i]); }
-			if(objects[i].confidence > 20) { countValid++; }
+			if(objects[i].confidence > minConfidence) { valid++; }
 		}
 		objects = validObjects;
 
 		// check if request is needed
-		if(countObjects != countValid) { needsRequest = true; }
+		if(countValidObjects != valid) { needsRequest = true; }
+
+		countValidObjects = valid;
 		sendRequest();
-	}
-
-
-
-/*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//	STREETS
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
-
-
-	void PSDescribe::updateStreets() {
-
 	}
 
 
@@ -164,18 +145,21 @@
 
 	void PSDescribe::sendRequest() {
 
-		if(objects.empty() || isSending || !needsRequest || projectId.isEmpty()) { return; }
-
+		if(isSending || !needsRequest || projectId.isEmpty()) { return; }
 
 		// save timestamp of request
 		qint64 timestamp = QDateTime::currentSecsSinceEpoch();
-		if(timestamp - timestampSent < 4) { return; }
+		if(timestamp - timestampSent < 2) { return; }
 		timestampSent = timestamp;
 
 		QJsonObject data;
 		QJsonArray scene;
 
+
+		// convert objects to form data
 		for(PSObject &object : objects) {
+
+			if(object.confidence <= minConfidence) { continue; }
 
 			// default properties
 			QJsonObject obj;
@@ -227,14 +211,9 @@
 		cv::multiply(*matRender, 0.5, *matRender);
 
 		// draw objects
-		int countObjects = 0;
 		for(int i = 0; i < (int) objects.size(); i++) {
 			
-			if(objects[i].confidence <= 20) { continue; }
-			countObjects++;
-
-            objects[i].detectColor();
-            objects[i].drawContour();
+            objects[i].drawContour(minConfidence);
 
 			// draw confidence above object
             cv::Rect boundingRect = cv::boundingRect(objects[i].candidatePoints);
@@ -244,21 +223,7 @@
 
 		// show candidate and object count in matRender
         cv::putText(*matRender, "Candidates: " + std::to_string(candidates.size()), cv::Point(30, 80), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
-        cv::putText(*matRender, "Objects: " + std::to_string(countObjects), cv::Point(30, 110), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
-	}
-
-
-	void PSDescribe::drawStreets() {
-
-		if(renderMode != RenderMode::PaperScope || viewMode != PSViewMode::Contours) { return; }
-
-		// cv::cvtColor(*matStreets, *matStreets, cv::COLOR_GRAY2BGR);
-		// cv::multiply(*matStreets, 0.25, *matStreets);
-
-		// draw contours
-		// for(int i = 0; i < (int) validContours.size(); i++) {
-		// 	cv::drawContours(*matRender, validContours, i, cv::Scalar(0, 0, 255), 1);
-		// }
+        cv::putText(*matRender, "Objects: " + std::to_string(countValidObjects), cv::Point(30, 110), cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
 	}
 
 

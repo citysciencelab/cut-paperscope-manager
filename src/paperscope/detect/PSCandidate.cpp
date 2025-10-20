@@ -63,10 +63,6 @@
 			
 			cv::approxPolyDP(contour, points, 0.002 * cv::arcLength(contour, true), true);
 		}
-		else if(shapeType == PSShapeType::Street) {
-
-			cv::approxPolyDP(contour, points ,1, true);
-		}
 		
 		return points;
 	}
@@ -82,7 +78,7 @@
 
 	void PSCandidate::drawBoundingBox(cv::Mat *matRender) {
 
-		cv::Scalar color = this->shapeType == PSShapeType::Street ? cv::Scalar(0, 0, 255) : cv::Scalar(0, 255, 0);
+		cv::Scalar color = cv::Scalar(0, 255, 0);
 
 		cv::Rect rect = cv::boundingRect(contour);
 		cv::rectangle(*matRender, rect, color);
@@ -94,7 +90,7 @@
 	void PSCandidate::drawShapeType(cv::Mat *matRender) {
 
 		std::string label;
-		cv::Scalar color = this->shapeType == PSShapeType::Street ? cv::Scalar(0, 0, 255) : cv::Scalar(0, 255, 0);
+		cv::Scalar color = cv::Scalar(0, 255, 0);
 
 		switch(shapeType) {
 			case PSShapeType::Rectangle: 	label = "rectangle"; break;
@@ -102,7 +98,6 @@
 			case PSShapeType::Triangle: 	label = "triangle"; break;
 			case PSShapeType::Cross: 		label = "cross"; break;
             case PSShapeType::Organic: 		label = "organic"; break;
-            case PSShapeType::Street: 		label = "street"; break;
 		}
 
 		// draw label
